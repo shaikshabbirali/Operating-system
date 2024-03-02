@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/msg.h>
+#include <string.h>
+
+#define MSG_SIZE 256  // Maximum size of the message
+
+// Structure for the message
+struct msg_buffer {
+    long msg_type;  // Message type (must be greater than 0)
+    char msg_text[MSG_SIZE];  // Message content
+};
+
+int main() {
+    key_t key = 1234;  // Unique key for the message queue
+    int msgid;
+    struct msg_buffer message;
+
+    // Create the message queue
+    if ((msgid = msgget(key, IPC_CREAT | 0666)) < 0) {
+        perror("msgget");
+        exit(1);
+    }
+
+    // Sender process
+    pid_t pid = fork();
+
+    if (pid < 0) {
+        perror("fork");
+        exit(1);
+    } else if (pid == 0) {
+        // Child process (sender)
+        message.msg_type = 1;  // Message type
+        strcpy(message.msg_text, "Hello from the sender!");  // Message content
+
+        // Send the message to the message queue
+        if (msgsnd(msgid, &message, sizeof(message), 0) < 0) {
+            perror("msgsnd");
+            exit(1);
+        }
+
+        printf("Message sent by the sender\n");
+    } else {
+        // Parent process (receiver)
+        // Wait for the child process to finish
+        wait(NULL);
+
+        // Receive the message from the message queue
+        if (msgrcv(msgid, &message, sizeof(message), 1, 0) < 0) {
+            perror("msgrcv");
+            exit(1);
+        }
+
+        printf("Message received by the receiver: %s\n", message.msg_text);
+
+        // Delete the message queue
+        if (msgctl(msgid, IPC_RMID, NULL) < 0) {
+            perror("msgctl");
+            exit(1);
+        }
+    }
+
+    return 0;
+}
