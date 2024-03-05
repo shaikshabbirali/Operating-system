@@ -1,0 +1,70 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int pages[100], n, capacity, i, j, k = 0, page_faults = 0;
+
+    printf("Enter the number of pages: ");
+    scanf("%d", &n);
+
+    printf("Enter the reference string: ");
+    for (i = 0; i < n; i++)
+        scanf("%d", &pages[i]);
+
+    printf("Enter the number of frames: ");
+    scanf("%d", &capacity);
+
+    int q[capacity];
+    q[k] = pages[k];
+    printf("\n%d\n", q[k]);
+    page_faults++;
+    k++;
+
+    for (i = 1; i < n; i++) {
+        int c1 = 0;
+        for (j = 0; j < capacity; j++) {
+            if (pages[i] != q[j])
+                c1++;
+        }
+
+        if (c1 == capacity) {
+            if (k < capacity) {
+                q[k] = pages[i];
+                k++;
+                for (j = 0; j < k; j++)
+                    printf("\t%d", q[j]);
+                printf("\n");
+                page_faults++;
+            } else {
+                int lru = INT_MAX, val;
+                for (j = 0; j < capacity; j++) {
+                    if (q[j] != pages[i]) {
+                        if (k > 0 && k < n) {
+                            for (int m = i - 1; m >= 0; m--) {
+                                if (q[j] != pages[m])
+                                    c1++;
+                                else
+                                    break;
+                            }
+                        }
+                        if (c1 < lru) {
+                            lru = c1;
+                            val = q[j];
+                        }
+                    }
+                }
+                for (j = 0; j < capacity; j++) {
+                    if (q[j] == val) {
+                        q[j] = pages[i];
+                        break;
+                    }
+                }
+                printf("\t%d", pages[i]);
+                page_faults++;
+            }
+        }
+    }
+
+    printf("\nThe number of page faults is %d\n", page_faults);
+    return 0;
+}
