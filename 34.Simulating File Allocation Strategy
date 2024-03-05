@@ -1,0 +1,24 @@
+#include <stdio.h>
+
+// Define the maximum number of blocks
+#define MAX_BLOCKS 100
+
+// Structure to represent a file
+struct File {
+    int startBlock;
+    int length;
+};
+
+// Function to allocate contiguous blocks for a file
+void allocateContiguous(struct File file) {
+    printf("Allocating blocks for file starting at block %d:\n", file.startBlock);
+    for (int i = file.startBlock; i < file.startBlock + file.length; ++i) {
+        printf("Block %d\n", i);
+    }
+}
+
+int main() {
+    struct File myFile = {19, 6}; // Example: Starting block = 19, Length = 6
+    allocateContiguous(myFile);
+    return 0;
+}
