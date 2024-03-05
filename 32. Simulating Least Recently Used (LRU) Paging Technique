@@ -1,0 +1,8 @@
+#include <stdio.h>
+
+int main() {
+    // Implement LRU paging algorithm
+    // ...
+    printf("LRU paging simulation\n");
+    return 0;
+}
