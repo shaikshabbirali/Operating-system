@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int RQ[100], i, n, TotalHeadMovement = 0, initial, size, move;
+
+    printf("Enter the number of requests: ");
+    scanf("%d", &n);
+
+    printf("Enter the request sequence: ");
+    for (i = 0; i < n; i++)
+        scanf("%d", &RQ[i]);
+
+    printf("Enter initial head position: ");
+    scanf("%d", &initial);
+
+    printf("Enter total disk size: ");
+    scanf("%d", &size);
+
+    printf("Enter the head movement direction (1 for high to low, 0 for low to high): ");
+    scanf("%d", &move);
+
+    // Sort the request queue
+    for (i = 0; i < n - 1; i++) {
+        for (int j = i + 1; j < n; j++) {
+            if (RQ[i] > RQ[j]) {
+                int temp = RQ[i];
+                RQ[i] = RQ[j];
+                RQ[j] = temp;
+            }
+        }
+    }
+
+    int index;
+    for (i = 0; i < n; i++) {
+        if (initial < RQ[i]) {
+            index = i;
+            break;
+        }
+    }
+
+    if (move == 1) {
+        // Moving from index to the end
+        for (i = index; i < n; i++) {
+            TotalHeadMovement += abs(RQ[i] - initial);
+            initial = RQ[i];
+        }
+        // Movement from max to min disk
+        TotalHeadMovement += abs(size - RQ[i - 1] - 1);
+        // Movement from max to 0
+        TotalHeadMovement += abs(size - 1 - 0);
+        initial = 0;
+        // Moving from 0 to index
+        for (i = 0; i < index; i++) {
+            TotalHeadMovement += abs(RQ[i] - initial);
+            initial = RQ[i];
+        }
+    } else {
+        // Moving from index to 0
+        for (i = index - 1; i >= 0; i--) {
+            TotalHeadMovement += abs(RQ[i] - initial);
+            initial = RQ[i];
+        }
+        // Movement from min to max disk
+        TotalHeadMovement += abs(RQ[i + 1] - 0);
+        // Movement from max to 0
+        TotalHeadMovement += abs(size - 1 - 0);
+        initial = size - 1;
+        // Moving from max to index
+        for (i = n - 1; i >= index; i--) {
+            TotalHeadMovement += abs(RQ[i] - initial);
+            initial = RQ[i];
+        }
+    }
+
+    printf("Total head movement is %d\n", TotalHeadMovement);
+    return 0;
+}
